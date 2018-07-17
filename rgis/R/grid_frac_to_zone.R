@@ -2,31 +2,88 @@ library(dplyr)
 library(sf)
 library(tools)
 library(lwgeom)
+library(fasterize)
 
-#' Build a global vector polygon fishnet with grid spacing provided by the user.
-#' The data frame is given a unique attribute value for each cell; this is named
-#' "fn_key" and is a large integer from 1..n.  The "grid_area" field is the area in
-#' the linear units of the defined coordinate system for each cell.
+#' Create a raster from a polygon sf object
 #'
+#' Creates a raster from a polygon sf object using the fasterize library and
+#' function which provides great improvement over raster::rasterize. See
+#' https://cran.r-project.org/web/packages/fasterize/fasterize.pdf
+#'
+#' @param sf an sf::sf() object with a geometry column of POLYGON and/or MULTIPOLYGON
+#' objects
+#' @param raster A raster object. Used as a template for the raster output. Can be created with
+#' raster::raster(). The fasterize package provides a method to create a raster
+#' object from an sf object.
+#' @param field character. The name of a column in sf, providing a value for each of the polygons
+#' rasterized. If NULL (default), all polygons will be given a value of 1.
+#' @param fun character. The name of a function by which to combine overlapping polygons.
+#' Currently takes "sum", "first", "last", "min", "max", "count", or "any". Future
+#' versions may include more functions or the ability to pass custom R/C++ functions.
+#' If you need to summarize by a different function, useby= to get a RasterBrick
+#' and then raster::stackApply() or raster::calc() to summarize.
+#' @param background numeric. Value to put in the cells that are not covered by any of the features of
+#' x. Default is NA.
+#' @param by character. The name of a column in sf by which to aggregate layers. If set,
+#' fasterize will return a RasterBrick with as many layers as unique values of the by column.
+#' @return raster object
+#' @export
+polygon_to_raster <- function(raster, field = NULL, fun, background = NA_real_, by = NULL) {
+  return(fasterize::fasterize(raster, field, fun, background, by))
+}
+
+
+
+#' Create a spatial polygon bounding box sf object
+#'
+#' Creates a spatial polygon bounding box from a user-provided extent
+#' and coordinate reference system.
+#'
+#' @param x_min A float or integer value for the x (longitude) coordinate minimum
+#' @param x_max A float or integer value for the x (longitude) coordinate maximum
+#' @param y_min A float or integer value for the y (latitude) coordinate minimum
+#' @param y_max A float or integer value for the y (latitude) coordinate maximum
+#' @param my_crs An integer for the EPSG number of the desired output coordinate
+#' reference system.
+#' @return A bounding box polygon as an sf object
+#' @export
+polygon_bounding_box <- function(x_min, x_max, y_min, y_max, my_crs) {
+
+  bbox <- matrix(c(x_min, y_max,
+                   x_max, y_max,
+                   x_max, y_min,
+                   x_min, y_min,
+                   x_min, y_max), byrow = TRUE, ncol = 2) %>%
+          list() %>%
+          sf::st_polygon() %>%
+          sf::st_sfc(., crs = my_crs)
+
+  return(bbox)
+}
+
+
+#' Build a vector polygon fishnet from reference object bounds and user-defined resolution.
+#'
+#' Build a global vector polygon fishnet with grid spacing provided by the user and
+#' bounds determined by the input reference object (ref_obj). The data frame is given
+#' a unique attribute value for each cell named "fn_key" and is a large integer
+#' from 1..n.  The "grid_area" field is the area in the linear units of the user-defined
+#' coordinate system for each cell.
+#'
+#' @param ref_obj An sf spatial object that will be used to create the bounds of the fishnet
 #' @param resolution A float value for the desired grid resolution of the fishnet.
-#' @param my_crs The EPSG number of the desired coordinate reference system. The
-#' default is 4326 (WGS 1984).
+#' @param my_crs An integer for the EPSG number of the desired output coordinate
+#' reference system. The default is 3857 which is the WGS 84 / Pseudo-Mercator -- Spherical
+#' Mercator system commonly used by Google Maps, OpenStreetMap, etc.
 #' @return A simple features (sf) spatial data frame object.
 #' @export
-build_fishnet <- function(resolution, my_crs = 4326) {
+build_fishnet <- function(ref_obj, resolution, my_crs = 3857) {
 
-  # create a global bounding box initially in WGS 84 - EPSG 4326
-  bbox <- matrix(c(-180,  90,
-                    180,  90,
-                    180, -90,
-                   -180, -90,
-                   -180,  90), byrow = TRUE, ncol = 2) %>%
-    list() %>%
-    sf::st_polygon() %>%
-    sf::st_sfc(., crs = 4326)
+  # get the CRS of the input reference spatial data
+  native_crs <- sf::st_crs(ref_obj)
 
   # create grid and give it a fn_key from 1..n and transform to target CRS
-  fn <- sf::st_make_grid(bbox, cellsize = c(resolution, resolution), crs = 4326, what = 'polygons') %>%
+  fn <- sf::st_make_grid(ref_obj, cellsize = c(resolution, resolution), crs = native_crs, what = 'polygons') %>%
         sf::st_sf('geometry' = ., data.frame('fn_key' = 1:length(.))) %>%
         sf::st_transform(crs = my_crs)
 
@@ -36,6 +93,8 @@ build_fishnet <- function(resolution, my_crs = 4326) {
   return(fn)
 }
 
+#' Import point data from a shapefile, CSV, or sf object.
+#'
 #' Import point data that contains a value to be spatially joined to the fishnet containing
 #' fractional area.  May either be a shapefile or a CSV file containing a latitude and longitude
 #' for each record.
@@ -51,7 +110,7 @@ build_fishnet <- function(resolution, my_crs = 4326) {
 #' @return A simple features (sf) spatial data frame object.
 #' @export
 import_points <- function(f, pts_lat_field = FALSE, pts_lon_field = FALSE, pts_crs = 4326,
-                          my_crs = 4326) {
+                          my_crs = 3857) {
 
   # get file extension
   fext <- tools::file_ext(f) %>%
@@ -111,7 +170,7 @@ import_points <- function(f, pts_lat_field = FALSE, pts_lon_field = FALSE, pts_c
 #' @export
 grid_frac_zone <- function(poly_zone_shp, points_file, pts_value_field, resolution,
                            pts_lat_field = 'latitude', pts_lon_field = 'longitude',
-                           pts_crs = 4326, my_crs = 4326) {
+                           pts_crs = 4326, my_crs = 3857) {
 
   # import polygon zone shapefile and transform it to the target CRS
   polys <- sf::st_read(poly_zone_shp) %>%
