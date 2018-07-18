@@ -3,6 +3,7 @@ library(sf)
 library(tools)
 library(lwgeom)
 library(fasterize)
+library(spex)
 
 #' Create a raster from a polygon sf object
 #'
@@ -13,25 +14,52 @@ library(fasterize)
 #' @param sf an sf::sf() object with a geometry column of POLYGON and/or MULTIPOLYGON
 #' objects
 #' @param raster A raster object. Used as a template for the raster output. Can be created with
-#' raster::raster(). The fasterize package provides a method to create a raster
-#' object from an sf object.
+#' raster::raster()
 #' @param field character. The name of a column in sf, providing a value for each of the polygons
-#' rasterized. If NULL (default), all polygons will be given a value of 1.
+#' rasterized. If NULL (default), all polygons will be given a value of 1
 #' @param fun character. The name of a function by which to combine overlapping polygons.
 #' Currently takes "sum", "first", "last", "min", "max", "count", or "any". Future
 #' versions may include more functions or the ability to pass custom R/C++ functions.
 #' If you need to summarize by a different function, useby= to get a RasterBrick
-#' and then raster::stackApply() or raster::calc() to summarize.
+#' and then raster::stackApply() or raster::calc() to summarize
 #' @param background numeric. Value to put in the cells that are not covered by any of the features of
 #' x. Default is NA.
 #' @param by character. The name of a column in sf by which to aggregate layers. If set,
-#' fasterize will return a RasterBrick with as many layers as unique values of the by column.
+#' fasterize will return a RasterBrick with as many layers as unique values of the by column
 #' @return raster object
 #' @export
 polygon_to_raster <- function(raster, field = NULL, fun, background = NA_real_, by = NULL) {
+
   return(fasterize::fasterize(raster, field, fun, background, by))
 }
 
+
+#' Create a polygon sf object from a raster
+#'
+#' Create a polygon sf object from a raster, stack, or brick.
+#'
+#' @param raster A raster, stack, or brick object
+#' @param na.rm boolean. If TRUE will polygonize only non-NA cells. Defualt is FALSE.
+#'
+#' @export
+raster_to_polygon <- function(raster, na.rm = FALSE) {
+
+  return(spex::qm_rasterToPolygons(raster, na.rm))
+}
+
+
+#' Create a raster object from a file path
+#'
+#' Create a raster object from a character full path to raster file with filename
+#' and extension.
+#'
+#' @param raster_path character. A full path to the input raster file with filename and extnsion
+#' @return raster object
+#' @export
+raster_object <- function(raster_path) {
+
+  fasterize::raster(raster_path)
+}
 
 
 #' Create a spatial polygon bounding box sf object
