@@ -8,5 +8,5 @@ The `rgis` package facilitates GIS functionality and workflows commonly reprente
 `rgis` can be installed directly from its github repository using the R `devtools` package. From an R prompt, run the command:
 
 ```r
-devtools::install_github('jgcri/rgis/rgis')
+devtools::install_github('jgcri/rgis')
 ```
