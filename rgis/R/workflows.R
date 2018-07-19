@@ -15,15 +15,18 @@ grid_to_zone_fraction <- function(poly_path, ncdf_path, out_csv, to_crs = 3857) 
   # read in the NetCDF file as a raster brick
   nc <- rgis::import_ncdf_to_raster(ncdf_path)
 
-  # get coordinate system from NetCDF file
+  # get coordinate system from NetCDF
   proc_crs <- sf::st_crs(raster::projection(nc))
+
+  # get resolution from NetCDF
+  resolution <- raster::res(nc)[1]
 
   # read in county shapefile to sf object and transform projection to NetCDF CRS
   polys <- rgis::import_shapefile(poly_path) %>%
            sf::st_transform(crs = proc_crs)
 
   # build fishnet from poly extent with grid size of NetCDF and transform output to target projected CRS
-  fishnet <- rgis::build_fishnet(polys, resolution = raster::res(nc)[1], to_crs = to_crs) %>%
+  fishnet <- rgis::build_fishnet(polys, resolution = resolution, to_crs = to_crs) %>%
              sf::st_cast("MULTIPOLYGON")
 
   # get centriods of the fishnet grid cells and transform to CRS of the NetCDF file
