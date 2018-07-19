@@ -2,6 +2,7 @@
 
 library(sf)
 library(raster)
+library(fasterize)
 
 #' Create an sf object from a shapefile
 #'
