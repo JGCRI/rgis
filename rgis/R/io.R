@@ -9,6 +9,7 @@ library(raster)
 #'
 #' @param shp_path character. A full path to the input shapefile with file name and extension
 #' @return sf object
+#' @author Chris R. Vernon (chris.vernon@pnnl.gov)
 #' @export
 import_shapefile <- function(shp_path, quiet = TRUE) {
 
@@ -22,6 +23,7 @@ import_shapefile <- function(shp_path, quiet = TRUE) {
 #'
 #' @param raster_path character. A full path to the input raster file with file name and extension
 #' @return raster object
+#' @author Chris R. Vernon (chris.vernon@pnnl.gov)
 #' @export
 import_raster <- function(raster_path) {
 
@@ -35,13 +37,14 @@ import_raster <- function(raster_path) {
 #'
 #' @param ncdf_path character. A full path to the input NetCDF file with the file name and extension
 #' @return raster object
+#' @author Chris R. Vernon (chris.vernon@pnnl.gov)
 #' @export
 import_ncdf_to_raster <- function(ncdf_file) {
 
   return(raster::brick(ncdf_file))
 }
 
-#' Import point data from a CSV file.
+#' Import point data from a CSV file
 #'
 #' Import point data that contains a value to be spatially joined to the fishnet containing
 #' fractional area.  May either be a shapefile or a CSV file containing a latitude and longitude
@@ -56,6 +59,7 @@ import_ncdf_to_raster <- function(ncdf_file) {
 #' default is EPSG:3857 the WGS 84 / Pseudo-Mercator -- Used by all modern web
 #' mapping applications.
 #' @return A simple features (sf) spatial data frame object.
+#' @author Chris R. Vernon (chris.vernon@pnnl.gov)
 #' @export
 import_points_from_csv <- function(f, pts_lat_field, pts_lon_field, pts_crs = 4326, my_crs = 3857) {
 

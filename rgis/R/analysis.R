@@ -18,6 +18,7 @@ library(lwgeom)
 #' @param my_crs An integer for the EPSG number of the desired output coordinate
 #' reference system.
 #' @return A bounding box polygon as an sf object
+#' @author Chris R. Vernon (chris.vernon@pnnl.gov)
 #' @export
 polygon_bounding_box <- function(x_min, x_max, y_min, y_max, my_crs) {
 
@@ -44,17 +45,24 @@ polygon_bounding_box <- function(x_min, x_max, y_min, y_max, my_crs) {
 #'
 #' @param ref_obj An sf spatial object that will be used to create the bounds of the fishnet
 #' @param resolution float. The desired grid resolution of the fishnet.
+#' @param lower_left_xy numeric of length 2. lower left corner corrdinates (x, y) of the grid
 #' @param to_crs integer. The EPSG number of the desired output coordinate
 #' reference system. The default is NULL; which will inherit the CRS of the input ref_obj.
 #' @return A simple features (sf) spatial data frame object.
+#' @author Chris R. Vernon (chris.vernon@pnnl.gov)
 #' @export
-build_fishnet <- function(ref_obj, resolution, to_crs = NULL) {
+build_fishnet <- function(ref_obj, resolution, lower_left_xy, to_crs = NULL) {
 
   # get the CRS of the input reference spatial data
-  native_crs <- sf::st_crs(ref_obj)
+  if (class(nc)[1] == "RasterBrick") {
+    native_crs <- sf::st_crs(raster::projection(nc))
+  }
+  else {
+    native_crs <- sf::st_crs(ref_obj)
+  }
 
   # create grid and give it a fn_key from 1..n and transform to target CRS
-  fn <- sf::st_make_grid(ref_obj, cellsize = c(resolution, resolution), crs = native_crs, what = 'polygons') %>%
+  fn <- sf::st_make_grid(ref_obj, cellsize = c(resolution, resolution), crs = native_crs, offset = lower_left_xy, what = 'polygons') %>%
         sf::st_sf('geometry' = ., data.frame('fn_key' = 1:length(.)))
 
   # transform if desired

@@ -11,6 +11,7 @@ library(lwgeom)
 #' @param sf_obj An polygon sf object
 #' @param field_name character. The name of the area field.
 #' @return Modified sf object
+#' @author Chris R. Vernon (chris.vernon@pnnl.gov)
 #' @export
 add_area_field <- function(sf_obj, field_name) {
 

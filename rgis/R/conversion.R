@@ -28,6 +28,7 @@ library(ncdf4)
 #' x. Default is NA.
 #' @param by character. The name of a column in sf by which to aggregate layers. If set,
 #' fasterize will return a RasterBrick with as many layers as unique values of the by column
+#' @author Chris R. Vernon (chris.vernon@pnnl.gov)
 #' @return raster object
 #' @export
 polygon_to_raster <- function(raster, field = NULL, fun, background = NA_real_, by = NULL) {
@@ -42,7 +43,7 @@ polygon_to_raster <- function(raster, field = NULL, fun, background = NA_real_, 
 #'
 #' @param raster A raster, stack, or brick object
 #' @param na.rm boolean. If TRUE will polygonize only non-NA cells. Defualt is FALSE.
-#'
+#' @author Chris R. Vernon (chris.vernon@pnnl.gov)
 #' @export
 raster_to_polygon <- function(raster, na.rm = FALSE) {
 
