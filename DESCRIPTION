@@ -1,11 +1,26 @@
 Package: rgis
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Title: R-based Geographic Information System (GIS) utilities
+Version: 0.0.1
+Authors@R: c(person("Chris", "Vernon",
+            email = "chris.vernon@pnnl.gov",
+            role = c("cre", "aut")),
+            person("Caleb", "Braun",
+            email = "caleb.braun@pnnl.gov",
+            role = "aut"),
+            person("Pacific Northwest National Laboratory",
+            role = "cph"))
+Description: The rgis package facilitates GIS functionality and workflows commonly reprented in propritary and open source GISs. This package does not contain functionality for visulization, but is focsed on geospatial algorithms for analysis, conversion, IO, modification, and workflows of spatial files and data structures.
+License: BSD 2-Clause
+Depends: R (>= 3.5.1)
+Imports:
+    dplyr (>= 0.7.6),
+    lwgeom (>= 0.1-4),
+    ncdf4 (>= 1.16),
+    raster (>= 2.6-7),
+    sf (>= 0.6-3),
+    spex (>= 0.5.0),
+    tools (>= 3.5.1),
+    fasterize (>= 1.0.0)
 Encoding: UTF-8
 LazyData: true
