@@ -6,7 +6,7 @@
 \usage{
 grid_to_zone_fraction(poly_path, ncdf_path, out_csv, to_crs = 3857,
   save_isct = NULL, save_fishnet = NULL, save_ncpts = NULL,
-  filter_NA = TRUE)
+  filter_na = TRUE)
 }
 \arguments{
 \item{poly_path}{character. A full path with file name and extension to the input polygon shapefile}
@@ -29,7 +29,7 @@ shapefile if desired as an output. Defualt NULL.}
 \item{save_ncpts}{character. A full path with file name and extension (shp) for the output NetCDF grid
 centroids that intersect the polygon fishnet shapefile if desired as an output. Defualt NULL.}
 
-\item{filter_NA}{boolean. TRUE (default) to remove NA land values where a fishnet grid intersected
+\item{filter_na}{boolean. TRUE (default) to remove NA land values where a fishnet grid intersected
 a polygon but the NetCDF had no underlying value; FALSE to keep NA}
 }
 \value{
