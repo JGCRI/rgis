@@ -54,8 +54,8 @@ polygon_bounding_box <- function(x_min, x_max, y_min, y_max, my_crs) {
 build_fishnet <- function(ref_obj, resolution, lower_left_xy, to_crs = NULL) {
 
   # get the CRS of the input reference spatial data
-  if (class(nc)[1] == "RasterBrick") {
-    native_crs <- sf::st_crs(raster::projection(nc))
+  if (class(ref_obj)[1] == "RasterBrick") {
+    native_crs <- sf::st_crs(raster::projection(ref_obj))
   }
   else {
     native_crs <- sf::st_crs(ref_obj)
