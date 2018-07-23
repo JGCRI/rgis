@@ -24,13 +24,13 @@ library(lwgeom)
 #' shapefile if desired as an output. Defualt NULL.
 #' @param save_ncpts character. A full path with file name and extension (shp) for the output NetCDF grid
 #' centroids that intersect the polygon fishnet shapefile if desired as an output. Defualt NULL.
-#' @param filter_NA boolean. TRUE (default) to remove NA land values where a fishnet grid intersected
+#' @param filter_na boolean. TRUE (default) to remove NA land values where a fishnet grid intersected
 #' a polygon but the NetCDF had no underlying value; FALSE to keep NA
 #' @return data.frame
 #' @author Chris R. Vernon (chris.vernon@pnnl.gov)
 #' @export
 grid_to_zone_fraction <- function(poly_path, ncdf_path, out_csv, to_crs = 3857, save_isct = NULL,
-                                  save_fishnet = NULL, save_ncpts = NULL, filter_NA = TRUE) {
+                                  save_fishnet = NULL, save_ncpts = NULL, filter_na = TRUE) {
 
   # read in the NetCDF file as a raster brick
   nc <- rgis::import_ncdf_to_raster(ncdf_path)
