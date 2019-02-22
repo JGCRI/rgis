@@ -31,9 +31,9 @@ library(ncdf4)
 #' @author Chris R. Vernon (chris.vernon@pnnl.gov)
 #' @return raster object
 #' @export
-polygon_to_raster <- function(raster, field = NULL, fun, background = NA_real_, by = NULL) {
+polygon_to_raster <- function(sf, raster, field = NULL, fun, background = NA_real_, by = NULL) {
 
-  return(fasterize::fasterize(raster, field, fun, background, by))
+  return(fasterize::fasterize(sf, raster, field, fun, background, by))
 }
 
 
