@@ -4,10 +4,14 @@
 \alias{import_shapefile}
 \title{Create an sf object from a shapefile}
 \usage{
-import_shapefile(shp_path, quiet = TRUE)
+import_shapefile(shp_path, quiet = TRUE, method = "sf")
 }
 \arguments{
 \item{shp_path}{character. A full path to the input shapefile with file name and extension}
+
+\item{quiet}{boolean.}
+
+\item{method}{tool used to convert to spatial data; either 'sf' or 'rgdal'}
 }
 \value{
 sf object

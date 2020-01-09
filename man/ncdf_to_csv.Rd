@@ -26,5 +26,5 @@ ncdf_to_csv(ncdf_file, out_csv, nc_var_name, resolution = 0.5,
 Convert NetCDF file to a CSV
 }
 \author{
-Caleb Braun (caleb.braun@pnnl.gov)
+Chris Vernon (chris.vernon@pnnl.gov)
 }

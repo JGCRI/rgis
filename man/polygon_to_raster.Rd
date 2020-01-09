@@ -4,10 +4,13 @@
 \alias{polygon_to_raster}
 \title{Create a raster from a polygon sf object}
 \usage{
-polygon_to_raster(raster, field = NULL, fun, background = NA_real_,
+polygon_to_raster(sf, raster, field = NULL, fun, background = NA_real_,
   by = NULL)
 }
 \arguments{
+\item{sf}{an sf::sf() object with a geometry column of POLYGON and/or MULTIPOLYGON
+objects}
+
 \item{raster}{A raster object. Used as a template for the raster output. Can be created with
 raster::raster()}
 
@@ -25,9 +28,6 @@ x. Default is NA.}
 
 \item{by}{character. The name of a column in sf by which to aggregate layers. If set,
 fasterize will return a RasterBrick with as many layers as unique values of the by column}
-
-\item{sf}{an sf::sf() object with a geometry column of POLYGON and/or MULTIPOLYGON
-objects}
 }
 \value{
 raster object

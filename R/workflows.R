@@ -27,6 +27,9 @@ library(lwgeom)
 #' @param filter_na boolean. TRUE (default) to remove NA land values where a fishnet grid intersected
 #' a polygon but the NetCDF had no underlying value; FALSE to keep NA
 #' @return data.frame
+#' @importFrom sf st_crs st_transform st_bbox st_cast st_centroid st_write st_intersection st_area 
+#' @importFrom raster res projection extract
+#' @importFrom dplyr left_join filter 
 #' @author Chris R. Vernon (chris.vernon@pnnl.gov)
 #' @export
 grid_to_zone_fraction <- function(poly_path, ncdf_path, out_csv, to_crs = 3857, save_isct = NULL,
@@ -36,48 +39,48 @@ grid_to_zone_fraction <- function(poly_path, ncdf_path, out_csv, to_crs = 3857, 
   nc <- rgis::import_ncdf_to_raster(ncdf_path)
 
   # get coordinate system from NetCDF
-  proc_crs <- sf::st_crs(raster::projection(nc))
+  proc_crs <- st_crs(projection(nc))
 
   # get resolution from NetCDF
-  resolution <- raster::res(nc)[1]
+  resolution <- res(nc)[1]
 
   # read in county shapefile to sf object and transform projection to NetCDF CRS
   polys <- rgis::import_shapefile(poly_path) %>%
-           sf::st_transform(crs = proc_crs)
+           st_transform(crs = proc_crs)
 
-  poly_bbox <- sf::st_bbox(polys)
+  poly_bbox <- st_bbox(polys)
   llc <- c(floor(poly_bbox[1]), floor(poly_bbox[2]))
 
   # build fishnet from poly extent with grid size of NetCDF and transform output to target projected CRS
   fishnet <- rgis::build_fishnet(polys, resolution = resolution, lower_left_xy = llc, to_crs = to_crs) %>%
-             sf::st_cast("MULTIPOLYGON")
+             st_cast("MULTIPOLYGON")
 
   # get centriods of the fishnet grid cells and transform to CRS of the NetCDF file
-  fn_pts <- sf::st_centroid(fishnet) %>%
-            sf::st_transform(sf::st_crs(raster::projection(nc)))
+  fn_pts <- st_centroid(fishnet) %>%
+            st_transform(st_crs(projection(nc)))
 
   # extract the values of the NetCDF file to a matrix based upon the points; bind to the fishnet centroids
-  nc_pts <- raster::extract(nc, fn_pts) %>%
+  nc_pts <- extract(nc, fn_pts) %>%
             cbind(fn_pts) %>%
-            sf::st_transform(crs = to_crs)
+            st_transform(crs = to_crs)
 
   if (!is.null(save_ncpts)) {
-    sf::st_write(nc_pts, save_ncpts)
+    st_write(nc_pts, save_ncpts)
   }
 
   # transform counties sf object CRS to match fishnet and calculate area field in square meters
-  polys <- sf::st_transform(polys, crs = to_crs) %>%
+  polys <- st_transform(polys, crs = to_crs) %>%
            rgis::add_area_field(field_name = 'poly_area') %>%
-           sf::st_cast("MULTIPOLYGON")
+           st_cast("MULTIPOLYGON")
 
   if (!is.null(save_fishnet)) {
-    sf::st_write(fishnet, save_fishnet)
+    st_write(fishnet, save_fishnet)
   }
 
   # intersect the polygon zones with the fishnet
-  isct <- sf::st_intersection(polys, fishnet) %>%
-          sf::st_cast("MULTIPOLYGON")
-  isct$part_area <- sf::st_area(isct$geometry)
+  isct <- st_intersection(polys, fishnet) %>%
+          st_cast("MULTIPOLYGON")
+  isct$part_area <- st_area(isct$geometry)
 
   # calculate the fraction of the zone that is in a grid cell
   isct$zone_frac <- isct$part_area / isct$poly_area
@@ -86,17 +89,17 @@ grid_to_zone_fraction <- function(poly_path, ncdf_path, out_csv, to_crs = 3857, 
   isct$cell_frac <- isct$part_area / isct$grid_area
 
   if (!is.null(save_isct)) {
-    sf::st_write(isct, save_isct)
+    st_write(isct, save_isct)
   }
 
   # left join the netcdf points to the fractional features
   nc_pts$geometry <- NULL
   isct$geometry <- NULL
-  isfn <- dplyr::left_join(x = isct, y = nc_pts, by = 'fn_key')
+  isfn <- left_join(x = isct, y = nc_pts, by = 'fn_key')
 
   # remove NA land values where a fishnet grid intersected a polygon but the NetCDF had no underlying value
   if (filter_na == TRUE) {
-    isfn <- dplyr::filter(isfn, !is.na(isfn[names(nc_pts)[1]]))
+    isfn <- filter(isfn, !is.na(isfn[names(nc_pts)[1]]))
   }
 
   # drop unneeded columns

@@ -7,7 +7,7 @@
 import_ncdf_to_raster(ncdf_file)
 }
 \arguments{
-\item{ncdf_path}{character. A full path to the input NetCDF file with the file name and extension}
+\item{ncdf_file}{character. A full path to the input NetCDF file with the file name and extension}
 }
 \value{
 raster object
