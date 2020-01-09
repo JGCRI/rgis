@@ -15,13 +15,20 @@ License: BSD 2-Clause
 Depends: R (>= 3.3)
 Imports:
     dplyr (>= 0.7.6),
-    lwgeom (>= 0.1-4),
     ncdf4 (>= 1.16),
     raster (>= 2.6-7),
     sf (>= 0.6-3),
     spex (>= 0.5.0),
     tools (>= 3.5.1),
-    fasterize (>= 1.0.0)
+    fasterize (>= 1.0.0),
+    doParallel,
+    foreach,
+    magrittr,
+    rgdal,
+    smoothr,
+    tibble,
+    units,
+    lwgeom (>= 0.1-4)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
