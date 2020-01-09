@@ -1,4 +1,4 @@
 library(testthat)
-library(teleconnect)
+library(rgis)
 
-test_check("teleconnect")
+test_check("rgis")
