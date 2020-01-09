@@ -1,20 +1,22 @@
 # Input/Output IO tools for rgis
 
-library(sf)
-library(raster)
-library(fasterize)
 
 #' Create an sf object from a shapefile
 #'
 #' Create an sf object from a full path to shapefile with file name and extension
 #'
 #' @param shp_path character. A full path to the input shapefile with file name and extension
+#' @param quiet boolean.
+#' @param method tool used to convert to spatial data; either 'sf' or 'rgdal'
 #' @return sf object
 #' @author Chris R. Vernon (chris.vernon@pnnl.gov)
+#' @importFrom sf st_read
+#' @importFrom rgdal readOGR
 #' @export
-import_shapefile <- function(shp_path, quiet = TRUE) {
-
-  return(sf::st_read(shp_path, quiet = quiet))
+import_shapefile <- function(shp_path, quiet = TRUE, method = "sf") {
+  
+  if(method == "sf") return(st_read(shp_path, quiet = quiet))
+  if(method == "rgdal") return(readOGR(shp_path, verbose = !quiet))
 }
 
 
@@ -24,11 +26,12 @@ import_shapefile <- function(shp_path, quiet = TRUE) {
 #'
 #' @param raster_path character. A full path to the input raster file with file name and extension
 #' @return raster object
+#' @importFrom raster raster
 #' @author Chris R. Vernon (chris.vernon@pnnl.gov)
 #' @export
 import_raster <- function(raster_path) {
-
-  return(fasterize::raster(raster_path))
+  
+  return(raster(raster_path))
 }
 
 
@@ -36,14 +39,16 @@ import_raster <- function(raster_path) {
 #'
 #' Import NetCDF to brick raster
 #'
-#' @param ncdf_path character. A full path to the input NetCDF file with the file name and extension
+#' @param ncdf_file character. A full path to the input NetCDF file with the file name and extension
+#' @importFrom raster brick
 #' @return raster object
 #' @author Chris R. Vernon (chris.vernon@pnnl.gov)
 #' @export
 import_ncdf_to_raster <- function(ncdf_file) {
-
-  return(raster::brick(ncdf_file))
+  
+  return(brick(ncdf_file))
 }
+
 
 #' Import point data from a CSV file
 #'
@@ -59,20 +64,21 @@ import_ncdf_to_raster <- function(ncdf_file) {
 #' @param my_crs int. The EPSG number of the desired coordinate reference system. The
 #' default is EPSG:3857 the WGS 84 / Pseudo-Mercator -- Used by all modern web
 #' mapping applications.
+#' @importFrom sf st_as_sf st_transform
 #' @return A simple features (sf) spatial data frame object.
 #' @author Chris R. Vernon (chris.vernon@pnnl.gov)
 #' @export
 import_points_from_csv <- function(f, pts_lat_field, pts_lon_field, pts_crs = 4326, my_crs = 3857) {
-
+  
   pts <- read.csv(file = f, header = TRUE, sep = ',')
-
+  
   # change latitude, longitude columns to numeric
   cols.num <- c(pts_lat_field, pts_lon_field)
   pts[cols.num] <- sapply(pts[cols.num], as.numeric)
-
+  
   # convert to sf spatial data frame object and transform to target CRS
-  pts.SP <- sf::st_as_sf(pts, coords = c(pts_lat_field, pts_lon_field), crs = pts_crs) %>%
-    sf::st_transform(crs = my_crs)
-
+  pts.SP <- st_as_sf(pts, coords = c(pts_lat_field, pts_lon_field), crs = pts_crs) %>%
+    st_transform(crs = my_crs)
+  
   return(pts)
 }
