@@ -4,7 +4,6 @@ language: r
 sudo: required
 cache: packages
 warnings_are_errors: false
-
 addons:
   apt:
     sources:
@@ -16,3 +15,7 @@ addons:
       - libgeos-dev
       - libgdal-dev
       - netcdf-bin
+r_packages:
+  - covr
+after_success:
+  - Rscript -e 'library(covr); codecov()'
