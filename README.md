@@ -1,7 +1,5 @@
 
-[![DOI](https://zenodo.org/badge/140853064.svg)](https://zenodo.org/badge/latestdoi/140853064)
-
-[![Build Status](https://travis-ci.org/JGCRI/rgis.svg?branch=master)](https://travis-ci.org/JGCRI/rgis)
+[![DOI](https://zenodo.org/badge/140853064.svg)](https://zenodo.org/badge/latestdoi/140853064) [![Build Status](https://travis-ci.org/JGCRI/rgis.svg?branch=master)](https://travis-ci.org/JGCRI/rgis) [![codecov](https://codecov.io/gh/JGCRI/rgis/branch/master/graph/badge.svg)](https://codecov.io/gh/JGCRI/rgis)
 
 # rgis
 R-based Geographic Information System (GIS) utilities
