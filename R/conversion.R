@@ -113,7 +113,6 @@ ncdf_to_csv <- function(ncdf_file, out_csv, nc_var_name, resolution = 0.5, start
 #' @importFrom gdalUtilities gdalwarp gdal_translate
 #' @author Kanishka Narayan (kanishka.narayan@pnnl.gov)
 #' @export
-
 warp_raster<- function(input_file='input.tif',input_format=".tif",NO_DATA_STATUS=TRUE,method="average", no_data_value=127,
                        resolution="+proj=longlat +ellps=WGS84",col_row=c(4320,2160),
                        extent=c(-180,-90,180,90),out_file="outfile",output_format="ENVI"){
@@ -122,21 +121,26 @@ warp_raster<- function(input_file='input.tif',input_format=".tif",NO_DATA_STATUS
   if (NO_DATA_STATUS==TRUE){
     print("Warning: filling no_data values may take a significantly long time  with big datasets")
     
-    gdalwarp(srcfile = input_file, dstfile = paste0("tmp",input_format) ,srcnodata = no_data_value,dstnodata = 0)
+    #Create a temporary directory
+    dir.create("tmp")
     
-    gdal_translate(a_nodata = 0, src_dataset = paste0("tmp",input_format),dst_dataset = paste0("tmp1",input_format))
+    #Convert no_data  codes to 0  
+    gdalwarp(srcfile = input_file, dstfile = paste0("tmp/tmp",input_format) ,srcnodata = no_data_value,dstnodata = 0)
     
-    file.remove(paste0("tmp",input_format))
+    #convert all no_data values to 0 
+    gdal_translate(a_nodata = 0, src_dataset = paste0("tmp/tmp",input_format),dst_dataset = paste0("tmp/tmp1",input_format))
+    
     
     #Take off no-data tag
-    gdal_translate(a_nodata = "none", src_dataset = paste0("tmp1",input_format),dst_dataset = paste0("tmp2",input_format))
+    gdal_translate(a_nodata = "none", src_dataset = paste0("tmp/tmp1",input_format),dst_dataset = paste0("tmp/tmp2",input_format))
     
-    file.remove(paste0("tmp1",input_format))
-    
-    return(gdalwarp(paste0("tmp2",input_format),out_file,r= method,
+    #reproject and return
+    return(gdalwarp(paste0("tmp/tmp2",input_format),out_file,r= method,
              ot="Float32",t_srs=resolution, te= extent,ts=col_row, of=output_format))
     
-    file.remove(paste0("tmp2",input_format))
+    #Now delete temporary directory 
+    unlink(("tmp"),recursive = TRUE,force = TRUE)
+    
   }else{
   
   return(gdalwarp(input_file,out_file,r= method,
@@ -145,3 +149,20 @@ warp_raster<- function(input_file='input.tif',input_format=".tif",NO_DATA_STATUS
 }
 }
 
+#' convert_file
+#'
+#' Convert files to specific formats
+#'
+#' @param inupt_file location of input file
+#' @param output_format Format of output. Currently set to ENVI.
+#' @param out_file Name of output file
+#' @importFrom gdalUtilities gdalwarp gdal_translate
+#' @author Kanishka Narayan (kanishka.narayan@pnnl.gov)
+#' @export
+convert_file <- function(inupt_file="input.tif",out_file="output.bil",output_format="ENVI"){
+  
+  
+  return(gdal_translate(inupt_file,out_file, of = output_format))
+  
+  
+}
