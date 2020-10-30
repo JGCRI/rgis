@@ -4,8 +4,13 @@
 \alias{import_points_from_csv}
 \title{Import point data from a CSV file}
 \usage{
-import_points_from_csv(f, pts_lat_field, pts_lon_field, pts_crs = 4326,
-  my_crs = 3857)
+import_points_from_csv(
+  f,
+  pts_lat_field,
+  pts_lon_field,
+  pts_crs = 4326,
+  my_crs = 3857
+)
 }
 \arguments{
 \item{f}{character. The full path with filename and extension to the points dataset.}

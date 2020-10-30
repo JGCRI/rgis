@@ -4,8 +4,14 @@
 \alias{polygon_to_raster}
 \title{Create a raster from a polygon sf object}
 \usage{
-polygon_to_raster(sf, raster, field = NULL, fun, background = NA_real_,
-  by = NULL)
+polygon_to_raster(
+  sf,
+  raster,
+  field = NULL,
+  fun,
+  background = NA_real_,
+  by = NULL
+)
 }
 \arguments{
 \item{sf}{an sf::sf() object with a geometry column of POLYGON and/or MULTIPOLYGON

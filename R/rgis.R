@@ -6,7 +6,7 @@
 #' geospatial algorithms for analysis, conversion, IO, modification, and
 #' workflows of spatial files and data structures.
 #'
-#' @section Currently Supported
+#' @section Currently Supported:
 #'
 #' \strong{Analysis Tools:}
 #'

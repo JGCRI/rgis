@@ -19,7 +19,7 @@ Imports:
     raster (>= 2.6-7),
     sf (>= 0.6-3),
     spex (>= 0.5.0),
-    tools (>= 3.5.1),
+    tools (>= 3.5.0),
     fasterize (>= 1.0.0),
     doParallel,
     foreach,
@@ -33,7 +33,7 @@ Imports:
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Suggests: 
     testthat (>= 2.1.0),
     knitr,
