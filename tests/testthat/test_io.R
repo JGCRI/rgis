@@ -16,7 +16,7 @@ test_that("Test import raster", {
   
   
   expect_silent(as.data.frame(rasterToPoints(raster)))
-  expect_error(plot(raster),NA,"Raster is invalid. Unable to plot raster.")
+  
 })
 
 test_that("Test import ncdf", {
@@ -25,6 +25,4 @@ test_that("Test import ncdf", {
   #Test type
   expect(typeof(raster)=="S4","ncdf is not being translated to raster correctly")
   
-  #Test that raster can be plotted
-  expect_error(plot(raster),NA,"Raster is invalid. Unable to plot raster.")
 })
