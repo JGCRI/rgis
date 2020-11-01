@@ -1,4 +1,5 @@
 context("Test io functions")
+library(raster)
 
 test_that("Test import shapefile", {
   #Import the shape file
