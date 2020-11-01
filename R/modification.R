@@ -34,5 +34,25 @@ fill_polygon_holes <- function(sf_object, sqkm_threshold) {
   area_thresh <- set_units(sqkm_threshold, km^2)
   
   # remove holes
-  return(fill_holes(sf_object, threshold = area_thresh))
+  Final_shape_file <- fill_holes(sf_object, threshold = area_thresh)
+  
+  #Make valid
+  exceptions <- st_is_valid(Final_shape_file,NA_on_exception = TRUE)
+  na_exceptions <- exceptions[is.na(exceptions)]
+  self_intersections <- exceptions[exceptions=="FALSE"]
+  
+  #Fix invalid geometries
+  if(length(na_exceptions)>0){
+    
+    Final_shape_file <- st_make_valid(Final_shape_file)
+    
+  }
+  #Fix self intersections
+  if(length(self_intersections)>0){
+    
+    Final_shape_file <- st_make_valid(Final_shape_file)
+    
+  }
+  
+  return(Final_shape_file)
 }
