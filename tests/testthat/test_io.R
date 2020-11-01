@@ -1,4 +1,4 @@
-Context("Test io functions")
+context("Test io functions")
 
 test_that("Test import shapefile", {
   #Import the shape file
