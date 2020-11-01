@@ -14,7 +14,7 @@ test_that("Test import raster", {
   expect_silent(raster <- import_raster("test_data/tif/tas_watch_jan_1991_wgs84.tif"))
   
   
-  expect_silent(as.data.frame(rasterToPoints(raster)),"Raster is invalid. Unable to convert raster to data frame")
+  expect_silent(as.data.frame(rasterToPoints(raster)))
   expect_error(plot(raster),NA,"Raster is invalid. Unable to plot raster.")
 })
 
@@ -23,8 +23,7 @@ test_that("Test import ncdf", {
   expect_silent(raster <- import_ncdf_to_raster("test_data/nc/tas_watch_monthly_1991.nc4"))
   #Test type
   expect(typeof(raster)=="S4","ncdf is not being translated to raster correctly")
-  #Convert to dataframe
-  expect_silent(as.data.frame(raster,xy=TRUE),"Raster is invalid. Unable to convert raster to data frame")
+  
   #Test that raster can be plotted
   expect_error(plot(raster),NA,"Raster is invalid. Unable to plot raster.")
 })
