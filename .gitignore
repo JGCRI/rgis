@@ -56,3 +56,9 @@ rsconnect/
 
 .DS_Store
 packrat/lib*/
+temporary_output/
+*.pdf
+*.shp
+*.prj
+gcamusa_state_glu_intersections.dbf
+gcamusa_state_glu_intersections.shx
