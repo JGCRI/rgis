@@ -19,7 +19,7 @@ test_that("Test zone fractions computation", {
     group_by(GEOID) %>% 
     mutate(zone_frac=sum(as.double(zone_frac)),cell_frac=sum(as.double(zone_frac))) %>% 
     ungroup() %>% 
-    select(GEOID,zone_frac) %>% 
+    dplyr::select(GEOID,zone_frac) %>% 
     distinct()->grouped_output
   
   tmp <- grouped_output %>% filter(zone_frac < 0.96)
