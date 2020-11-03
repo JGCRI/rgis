@@ -172,6 +172,7 @@ get_intersection_fractions <- function(shpfile_1= "temporary_output/tl_2019_us_s
   
   st_make_valid(shp1_st) %>% st_intersection(st_make_valid(shp2_st)) -> insct                      
   
+  insct %>% filter(st_is(. , c("POLYGON", "MULTIPOLYGON"))) -> insct
   
   insct %>% st_cast("MULTIPOLYGON") -> insct 
   
