@@ -95,3 +95,5 @@ ncdf_to_csv <- function(ncdf_file, out_csv, nc_var_name, resolution = 0.5, start
   
   return(combined)
 }
+
+

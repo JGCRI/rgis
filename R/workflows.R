@@ -37,10 +37,18 @@ grid_to_zone_fraction <- function(poly_path, ncdf_path, out_csv, to_crs = 3857, 
 
   # read in the NetCDF file as a raster brick
   nc <- rgis::import_ncdf_to_raster(ncdf_path)
-
+  
+  nc_list <- as.list(nc)
+  
+  if(length(nc_list)>1){
+    
+    nc <- raster::subset(nc, 1)
+    
+  }
+  
   # get coordinate system from NetCDF
   proc_crs <- st_crs(projection(nc))
-
+   
   # get resolution from NetCDF
   resolution <- res(nc)[1]
 
@@ -110,4 +118,84 @@ grid_to_zone_fraction <- function(poly_path, ncdf_path, out_csv, to_crs = 3857, 
   write.csv(isfn, file = out_csv, row.names = FALSE)
 
   return(isfn)
+}
+
+#' Return intersection areas of two spatial files along with proportions used to downscale/aggregate 
+#'
+#' Intersect two shape files/spatial files, return proportions used to downscale or aggregate data based on calculated areas. 
+#' The function will return a sf data frame with additional columns including the areas for the spatial boundaries
+#' and the intersection. Two ratios are returned which can be used to downscale data or aggregate data as required.  
+#'
+#' @param shpfile_1 character. A full path with file name and extension to the input polygon shapefile
+#' @param shpfile_2 character. A full path with file name and extension to the input polygon shapefile 
+#' @param area_field_1 character.Name of column with area calculated for shapefile 1
+#' @param area_field_2 character.Name of column with area calculated for shapefile 2   
+#' @param out_csv character. A full path with file name and extension for the output CSV file
+#' @param to_crs int. The EPSG number of a projected coordinate reference system.  Must be projected
+#' and not geographic due to assumptions that sf::st_intersection makes when using
+#' geographic systems.  Default is EPSG:4326, WGS 84 
+#' @param shape_file character. The name of the shapefile to be returned 
+#' @param shape_file_cols vector. The names to be selected when returning the shape file.
+#' @return data.frame
+#' @importFrom sf st_crs st_transform st_bbox st_cast st_centroid st_write st_intersection st_area 
+#' @importFrom raster res projection extract
+#' @importFrom dplyr left_join filter 
+#' @author Kanishka Narayan (kanishka.narayan@pnnl.gov)
+#' @export
+get_intersection_fractions <- function(shpfile_1= "temporary_output/tl_2019_us_state.shp",
+                                       shpfile_2= "temporary_output/glu_boundaries_moirai_combined_3p1_0p5arcmin.shp",
+                                       area_field_1 = "state_area",
+                                       area_field_2 = "basin_area",
+                                       default_crs = 4326,
+                                       out_csv =NULL,
+                                       out_shape_file ="gcamusa_state_glu_intersections.shp",
+                                       shape_file_cols =c("glu_id","NAME","GEOID")){
+  
+  shp1_st <- st_read(shpfile_1)
+  
+  if(is.null(default_crs)){
+    
+    default_crs <- crs(shp1_st)  
+  
+  }
+  
+  shp1_st %>% st_transform(crs=default_crs) %>% 
+              st_cast("MULTIPOLYGON") %>%
+              st_make_valid() %>% 
+              add_area_field(area_field_1) -> shp1_st
+  
+  shp2_st <- st_read(shpfile_2) %>%
+             st_transform(crs=default_crs) %>% 
+             st_cast("MULTIPOLYGON") %>% 
+             st_make_valid() %>% 
+            add_area_field(area_field_2)   -> shp2_st
+  
+  st_make_valid(shp1_st) %>% st_intersection(st_make_valid(shp2_st)) -> insct                      
+  
+  insct %>% filter(st_is(. , c("POLYGON", "MULTIPOLYGON"))) -> insct
+  
+  insct %>% st_cast("MULTIPOLYGON") -> insct 
+  
+  insct %>% add_area_field("intersection_area") %>% 
+            mutate(ratio_1 = intersection_area/get(area_field_1),
+                   ratio_2 = intersection_area/get(area_field_2))-> insct_data
+  
+  if(!is.null(out_csv)){
+    
+    write.csv(as.data.frame(insct_data) %>% select(-geometry),out_csv,row.names = FALSE)
+    
+  }
+  
+  if(!is.null(out_shape_file)){
+    shape_file_cols <- c(shape_file_cols,"geometry")
+    insct_data %>% select(shape_file_cols)->insct_data
+    sf::st_write(insct_data,out_shape_file,driver="ESRI Shapefile")
+    
+  }
+  
+  
+  insct_data <- st_as_sf(insct_data)
+  
+  return(insct_data)    
+  
 }

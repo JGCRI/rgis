@@ -4,8 +4,15 @@
 \alias{ncdf_to_csv}
 \title{Convert NetCDF file to a CSV}
 \usage{
-ncdf_to_csv(ncdf_file, out_csv, nc_var_name, resolution = 0.5,
-  start_year = NULL, through_year = NULL, nmonths = NULL)
+ncdf_to_csv(
+  ncdf_file,
+  out_csv,
+  nc_var_name,
+  resolution = 0.5,
+  start_year = NULL,
+  through_year = NULL,
+  nmonths = NULL
+)
 }
 \arguments{
 \item{ncdf_file}{character. asdf}

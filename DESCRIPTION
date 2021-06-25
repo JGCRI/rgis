@@ -12,14 +12,15 @@ Authors@R: c(person("Chris", "Vernon",
             role = "cph"))
 Description: The rgis package facilitates GIS functionality and workflows commonly reprented in propritary and open source GISs. This package does not contain functionality for visulization, but is focsed on geospatial algorithms for analysis, conversion, IO, modification, and workflows of spatial files and data structures.
 License: BSD 2-Clause
-Depends: R (>= 3.3)
+Depends: R (>= 3.5)
 Imports:
     dplyr (>= 0.7.6),
-    ncdf4 (>= 1.16),
-    raster (>= 2.6-7),
-    sf (>= 0.6-3),
+    ncdf4 (>= 1.17),
+    raster (>= 3.1-5),
+    sf (>= 0.9-2),
+    sp (>= 1.4-1),
     spex (>= 0.5.0),
-    tools (>= 3.5.1),
+    tools (>= 3.5.0),
     fasterize (>= 1.0.0),
     doParallel,
     foreach,
@@ -28,11 +29,12 @@ Imports:
     smoothr,
     tibble,
     units,
-    lwgeom (>= 0.1-4)
+    lwgeom (>= 0.1-4),
+    gdalUtilities
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
 Suggests: 
     testthat (>= 2.1.0),
     knitr,

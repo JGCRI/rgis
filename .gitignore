@@ -56,3 +56,5 @@ rsconnect/
 
 .DS_Store
 packrat/lib*/
+temporary_output/
+*.csv
