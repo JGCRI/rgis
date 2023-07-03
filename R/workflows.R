@@ -32,95 +32,75 @@ library(lwgeom)
 #' @importFrom dplyr left_join filter 
 #' @author Chris R. Vernon (chris.vernon@pnnl.gov)
 #' @export
-grid_to_zone_fraction <- function(poly_path, ncdf_path, out_csv, to_crs = 3857, save_isct = NULL,
-                                  save_fishnet = NULL, save_ncpts = NULL, filter_na = TRUE) {
-
-  # read in the NetCDF file as a raster brick
-  nc <- rgis::import_ncdf_to_raster(ncdf_path)
+grid_to_zone_fractions <- function(poly_path = "C:/Projects/ctry_glu_boundaries_moirai_combined_3p1_0p5arcmin.shp",
+                                   raster_path = "C:/Projects/annual_area_harvested_irc_crop01_ha_30mn.asc",
+                                   csv_name = "MIRCA_intersections.csv",
+                                   perform_check=TRUE){
   
-  nc_list <- as.list(nc)
+  extent= c(-180,180,-90,90)
   
-  if(length(nc_list)>1){
-    
-    nc <- raster::subset(nc, 1)
-    
-  }
   
-  # get coordinate system from NetCDF
-  proc_crs <- st_crs(projection(nc))
-   
-  # get resolution from NetCDF
-  resolution <- res(nc)[1]
-
-  # read in county shapefile to sf object and transform projection to NetCDF CRS
-  polys <- rgis::import_shapefile(poly_path) %>%
-           st_transform(crs = proc_crs)
-
-  poly_bbox <- st_bbox(polys)
-  llc <- c(floor(poly_bbox[1]), floor(poly_bbox[2]))
-
-  # build fishnet from poly extent with grid size of NetCDF and transform output to target projected CRS
-  fishnet <- rgis::build_fishnet(polys, resolution = resolution, lower_left_xy = llc, to_crs = to_crs) %>%
-             st_cast("MULTIPOLYGON")
-
-  # get centriods of the fishnet grid cells and transform to CRS of the NetCDF file
-  fn_pts <- st_centroid(fishnet) %>%
-            st_transform(st_crs(projection(nc)))
-
-  # extract the values of the NetCDF file to a matrix based upon the points; bind to the fishnet centroids
-  nc_pts <- extract(nc, fn_pts) %>%
-            cbind(fn_pts) %>%
-            st_transform(crs = to_crs)
-
-  if (!is.null(save_ncpts)) {
-    st_write(nc_pts, save_ncpts)
-  }
-
-  # transform counties sf object CRS to match fishnet and calculate area field in square meters
-  polys <- st_transform(polys, crs = to_crs) %>%
-           rgis::add_area_field(field_name = 'poly_area') %>%
-           st_cast("MULTIPOLYGON")
-
-  if (!is.null(save_fishnet)) {
-    st_write(fishnet, save_fishnet)
-  }
-
-  # intersect the polygon zones with the fishnet
-  isct <- st_intersection(polys, fishnet) %>%
-          st_cast("MULTIPOLYGON")
+  r <- raster(raster_path)
+  
+  resolution <- res(r)[1]
+  
+  
+  
+  
+  polys <- rgis::import_shapefile(poly_path) %>% 
+    add_area_field("polygon_area")
+  
+  gr <- st_make_grid(polys, cellsize = c(resolution,resolution)) %>% 
+    st_sf()%>% 
+    add_area_field("cell_area") %>% 
+    mutate(cell_id=row_number())
+  
+  grid_lonlat <- st_transform(gr, "+proj=longlat")
+  centroids <- st_centroid(grid_lonlat)
+  
+  gr$Latitude <- st_coordinates(centroids)[, 2]
+  gr$Longitude <- st_coordinates(centroids)[, 1]
+  
+  
+  
+  gr %>% st_make_valid() %>% filter(st_is(. , c("POLYGON", "MULTIPOLYGON")))->valid_grid
+  
+  
+  
+  isct <- st_intersection(polys, valid_grid)
   isct$part_area <- st_area(isct$geometry)
-
-  # calculate the fraction of the zone that is in a grid cell
-  isct$zone_frac <- isct$part_area / isct$poly_area
-
-  # calculate the fraction of the grid cell that is in a zone
-  isct$cell_frac <- isct$part_area / isct$grid_area
-
-  if (!is.null(save_isct)) {
-    st_write(isct, save_isct)
+  isct$zone_frac <- isct$part_area / isct$polygon_area
+  isct$cell_frac <- isct$part_area / isct$cell_area
+  
+  isct <- as.data.frame(isct)
+  isct %>% dplyr::select(-geometry)->isct
+  
+  if(!is.null(csv_name)){
+    write.csv(isct, csv_name,row.names = FALSE)
   }
-
-  # left join the netcdf points to the fractional features
-  nc_pts$geometry <- NULL
-  isct$geometry <- NULL
-  isfn <- left_join(x = isct, y = nc_pts, by = 'fn_key')
-
-  # remove NA land values where a fishnet grid intersected a polygon but the NetCDF had no underlying value
-  if (filter_na == TRUE) {
-    isfn <- filter(isfn, !is.na(isfn[names(nc_pts)[1]]))
+  
+  
+  if(perform_check){
+    raster_check <- as.data.frame(rasterToPoints(raster(raster_path)))
+    
+    colnames(raster_check)<- c("x","y","rast_val")
+    
+    isct %>% 
+      left_join(raster_check, by = c("Longitude"="x","Latitude"="y")) %>% 
+      mutate(new_val=rast_val*cell_frac)->t_file
+    
+    t_file <- as.data.frame(t_file)
+    
+    print(paste0("Total value from original raster is " ,sum(raster_check$rast_val)))
+    print(paste0("Total value from revised cell fractions is " ,sum(t_file$new_val)))
+    
+    
   }
-
-  # drop unneeded columns
-  drops <- c('poly_area', 'grid_area.x', 'part_area', 'grid_area.y')
-  isfn <- isfn[ , !(names(isfn) %in% drops)]
-
-  # export as CSV
-  write.csv(isfn, file = out_csv, row.names = FALSE)
-
-  return(isfn)
+  
+  return(isct)
 }
 
-#' Return intersection areas of two spatial files along with proportions used to downscale/aggregate 
+#' Return intersection areas of two spatial files along with proportions used to perform area based downscaling/aggregations 
 #'
 #' Intersect two shape files/spatial files, return proportions used to downscale or aggregate data based on calculated areas. 
 #' The function will return a sf data frame with additional columns including the areas for the spatial boundaries
@@ -149,7 +129,8 @@ get_intersection_fractions <- function(shpfile_1= "temporary_output/tl_2019_us_s
                                        default_crs = 4326,
                                        out_csv =NULL,
                                        out_shape_file ="gcamusa_state_glu_intersections.shp",
-                                       shape_file_cols =c("glu_id","NAME","GEOID")){
+                                       shape_file_cols =c("glu_id","NAME","GEOID"),
+                                       write_other_files=FALSE){
   
   shp1_st <- st_read(shpfile_1)
   
@@ -159,16 +140,38 @@ get_intersection_fractions <- function(shpfile_1= "temporary_output/tl_2019_us_s
   
   }
   
+  
+  
+  
   shp1_st %>% st_transform(crs=default_crs) %>% 
               st_cast("MULTIPOLYGON") %>%
               st_make_valid() %>% 
               add_area_field(area_field_1) -> shp1_st
+  
+  bbox1 <- st_bbox(shp1_st)
   
   shp2_st <- st_read(shpfile_2) %>%
              st_transform(crs=default_crs) %>% 
              st_cast("MULTIPOLYGON") %>% 
              st_make_valid() %>% 
             add_area_field(area_field_2)   -> shp2_st
+  
+  bbox2 <- st_bbox(shp2_st)
+  
+  if((bbox1[3]>bbox2[3]) & (bbox1[4]>bbox2[4])){
+    
+    
+    default_bbox <- bbox2 
+    
+  }else{
+    
+    default_bbox <- bbox1
+  }
+  
+  shp1_st <- st_crop(shp1_st, default_bbox)
+  
+  shp2_st <- st_crop(shp2_st, default_bbox)
+  
   
   st_make_valid(shp1_st) %>% st_intersection(st_make_valid(shp2_st)) -> insct                      
   
@@ -187,9 +190,19 @@ get_intersection_fractions <- function(shpfile_1= "temporary_output/tl_2019_us_s
   }
   
   if(!is.null(out_shape_file)){
+    
     shape_file_cols <- c(shape_file_cols,"geometry")
+    
     insct_data %>% select(shape_file_cols)->insct_data
+    
     sf::st_write(insct_data,out_shape_file,driver="ESRI Shapefile")
+    
+  }
+  
+  if(write_other_files){
+    
+    sf::st_write(shp1_st,"shp1.shp",driver="ESRI Shapefile")
+    sf::st_write(shp2_st,"shp2.shp",driver="ESRI Shapefile")
     
   }
   
@@ -199,3 +212,4 @@ get_intersection_fractions <- function(shpfile_1= "temporary_output/tl_2019_us_s
   return(insct_data)    
   
 }
+
