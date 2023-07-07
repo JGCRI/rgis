@@ -2,7 +2,7 @@
 % Please edit documentation in R/workflows.R
 \name{get_intersection_fractions}
 \alias{get_intersection_fractions}
-\title{Return intersection areas of two spatial files along with proportions used to downscale/aggregate}
+\title{Return intersection areas of two spatial files along with proportions used to perform area based downscaling/aggregations}
 \usage{
 get_intersection_fractions(
   shpfile_1 = "temporary_output/tl_2019_us_state.shp",
@@ -12,7 +12,8 @@ get_intersection_fractions(
   default_crs = 4326,
   out_csv = NULL,
   out_shape_file = "gcamusa_state_glu_intersections.shp",
-  shape_file_cols = c("glu_id", "NAME", "GEOID")
+  shape_file_cols = c("glu_id", "NAME", "GEOID"),
+  write_other_files = FALSE
 )
 }
 \arguments{
