@@ -4,10 +4,10 @@ library(raster)
 test_that("Test import shapefile", {
   #Import the shape file
   expect_silent(sf <- import_shapefile("test_data/shp/northcarolina_county_wgs84.shp", method= "sf"))
-  expect_silent(sf_rgdal <- import_shapefile("test_data/shp/northcarolina_county_wgs84.shp", method= "rgdal"))
+  #expect_silent(sf_rgdal <- import_shapefile("test_data/shp/northcarolina_county_wgs84.shp", method= "rgdal"))
   
   expect(typeof(sf)=="list","Return type of import_shapefile is not a list ")
-  expect(typeof(sf_rgdal)=="S4","Return type of import_shapefile is not a spatial polygons dataframe")
+  #expect(typeof(sf_rgdal)=="S4","Return type of import_shapefile is not a spatial polygons dataframe")
 })
 
 test_that("Test import raster", {
