@@ -34,7 +34,7 @@ library(lwgeom)
 #' @export
 grid_to_zone_fractions <- function(poly_path = "C:/Projects/ctry_glu_boundaries_moirai_combined_3p1_0p5arcmin.shp",
                                    raster_path = "C:/Projects/annual_area_harvested_irc_crop01_ha_30mn.asc",
-                                   csv_name = "MIRCA_intersections.csv",
+                                   csv_name = NULL,
                                    perform_check=FALSE){
   
   extent= c(-180,180,-90,90)
@@ -133,7 +133,7 @@ get_intersection_fractions <- function(shpfile_1= "temporary_output/tl_2019_us_s
                                        shape_file_cols =c("glu_id","NAME","GEOID"),
                                        write_other_files=FALSE){
   
-  shp1_st <- st_read(shpfile_1)
+  shp1_st <- st_read(shpfile_1,quiet=TRUE)
   
   if(is.null(default_crs)){
     
@@ -151,7 +151,7 @@ get_intersection_fractions <- function(shpfile_1= "temporary_output/tl_2019_us_s
   
   bbox1 <- st_bbox(shp1_st)
   
-  shp2_st <- st_read(shpfile_2) %>%
+  shp2_st <- st_read(shpfile_2,quiet=TRUE) %>%
              st_transform(crs=default_crs) %>% 
              st_cast("MULTIPOLYGON") %>% 
              st_make_valid() %>% 
