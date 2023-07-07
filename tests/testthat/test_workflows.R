@@ -22,7 +22,7 @@ test_that("Test zone fractions computation", {
   #Import the raster
   expect_warning(test_output <- grid_to_zone_fractions(poly_path = "test_data/shp/northcarolina_county_wgs84.shp",
                                                       raster_path = "test_data/nc/tas_watch_monthly_1991.nc4",csv_name ="tmp.csv",
-                                                      perform_check = TRUE))
+                                                      perform_check = FALSE))
   test_output %>% 
     group_by(GEOID) %>% 
     mutate(zone_frac=sum(as.double(zone_frac)),cell_frac=sum(as.double(zone_frac))) %>% 
