@@ -38,7 +38,7 @@ grid_to_zone_fractions <- function(poly_path = "C:/Projects/ctry_glu_boundaries_
                                    perform_check=TRUE){
   
   extent= c(-180,180,-90,90)
-  
+  sf_use_s2(FALSE)
   
   r <- raster(raster_path)
   
@@ -67,7 +67,7 @@ grid_to_zone_fractions <- function(poly_path = "C:/Projects/ctry_glu_boundaries_
   
   
   
-  isct <- st_intersection(polys, valid_grid)
+  isct <- st_intersection(st_make_valid(polys), valid_grid)
   isct$part_area <- st_area(isct$geometry)
   isct$zone_frac <- isct$part_area / isct$polygon_area
   isct$cell_frac <- isct$part_area / isct$cell_area
@@ -86,8 +86,9 @@ grid_to_zone_fractions <- function(poly_path = "C:/Projects/ctry_glu_boundaries_
     colnames(raster_check)<- c("x","y","rast_val")
     
     isct %>% 
-      left_join(raster_check, by = c("Longitude"="x","Latitude"="y")) %>% 
-      mutate(new_val=rast_val*cell_frac)->t_file
+     mutate(Longitude=round(Longitude,2),Latitude=round(Latitude,2))%>% 
+     left_join(raster_check, by = c("Longitude"="x","Latitude"="y")) %>% 
+     mutate(new_val=rast_val*cell_frac)->t_file
     
     t_file <- as.data.frame(t_file)
     
