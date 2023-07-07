@@ -7,7 +7,7 @@
 grid_to_zone_fractions(
   poly_path = "C:/Projects/ctry_glu_boundaries_moirai_combined_3p1_0p5arcmin.shp",
   raster_path = "C:/Projects/annual_area_harvested_irc_crop01_ha_30mn.asc",
-  csv_name = "MIRCA_intersections.csv",
+  csv_name = NULL,
   perform_check = FALSE
 )
 }
