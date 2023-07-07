@@ -9,7 +9,8 @@ test_that("Test intersection fraction computation", {
   
   expect_warning(test_output <- get_intersection_fractions(out_csv = NULL,out_shape_file = NULL,shpfile_1 = "test_data/shp/tl_2019_us_state.shp",
                                             shpfile_2 = "test_data/shp/glu_boundaries_moirai_combined_3p1_0p5arcmin.shp",
-                                            default_crs = crs_tmp))
+                                            default_crs = crs_tmp,
+                                            write_other_files=FALSE))
   
   tmpna <- test_output[is.na(test_output$ratio_1),]
   tmpna2 <- test_output[is.na(test_output$ratio_2),]
@@ -19,7 +20,7 @@ test_that("Test intersection fraction computation", {
 
 test_that("Test zone fractions computation", {
   #Import the raster
-  expect_warning(test_output <- grid_to_zone_fraction(poly_path = "test_data/shp/northcarolina_county_wgs84.shp",
+  expect_warning(test_output <- grid_to_zone_fractions(poly_path = "test_data/shp/northcarolina_county_wgs84.shp",
                                                       ncdf_path = "test_data/nc/tas_watch_monthly_1991.nc4",out_csv = "tmp.csv"))
   test_output %>% 
     group_by(GEOID) %>% 
