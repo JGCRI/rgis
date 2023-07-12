@@ -1,5 +1,7 @@
 
-[![DOI](https://zenodo.org/badge/140853064.svg)](https://zenodo.org/badge/latestdoi/140853064) ![R-CMD](https://github.com/JGCRI/rgis/actions/workflows/rcmd.yml/badge.svg) [![codecov](https://codecov.io/gh/JGCRI/rgis/branch/gdal-processing/graph/badge.svg?token=K2FK74mVFN)](https://codecov.io/gh/JGCRI/rgis)
+[![DOI](https://zenodo.org/badge/140853064.svg)](https://zenodo.org/badge/latestdoi/140853064) ![R-CMD](https://github.com/JGCRI/rgis/actions/workflows/rcmd.yml/badge.svg) 
+![test-coverage](https://github.com/JGCRI/rgis/actions/workflows/test_coverage.yaml/badge.svg)
+[![codecov](https://codecov.io/gh/JGCRI/rgis/branch/gdal-processing/graph/badge.svg?token=K2FK74mVFN)](https://codecov.io/gh/JGCRI/rgis)
 
 # rgis
 R-based Geographic Information System (GIS) utilities
