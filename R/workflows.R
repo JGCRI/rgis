@@ -29,7 +29,8 @@ library(lwgeom)
 #' @return data.frame
 #' @importFrom sf st_crs st_transform st_bbox st_cast st_centroid st_write st_intersection st_area 
 #' @importFrom raster res projection extract
-#' @importFrom dplyr left_join filter 
+#' @importFrom dplyr left_join filter mutate
+#' @importFrom sf sf_use_s2
 #' @author Chris R. Vernon (chris.vernon@pnnl.gov)
 #' @export
 grid_to_zone_fractions <- function(poly_path = "C:/Projects/ctry_glu_boundaries_moirai_combined_3p1_0p5arcmin.shp",
