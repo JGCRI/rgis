@@ -1,7 +1,3 @@
-library(dplyr)
-library(sf)
-library(lwgeom)
-
 #' Create fractional area of NetCDF grid cells to corresponding polygon features and vice versa
 #'
 #' Create fractional area of NetCDF grid cells to corresponding polygon features and
@@ -29,7 +25,7 @@ library(lwgeom)
 #' @return data.frame
 #' @importFrom sf st_crs st_transform st_bbox st_cast st_centroid st_write st_intersection st_area 
 #' @importFrom raster res projection extract
-#' @importFrom dplyr left_join filter mutate
+#' @importFrom dplyr left_join filter mutate row_number distinct
 #' @importFrom sf sf_use_s2
 #' @author Chris R. Vernon (chris.vernon@pnnl.gov)
 #' @export
@@ -54,7 +50,7 @@ grid_to_zone_fractions <- function(poly_path = "C:/Projects/ctry_glu_boundaries_
   gr <- st_make_grid(polys, cellsize = c(resolution,resolution)) %>% 
     st_sf()%>% 
     add_area_field("cell_area") %>% 
-    mutate(cell_id=row_number())
+    mutate(cell_id=dplyr::row_number())
   
   grid_lonlat <- st_transform(gr, "+proj=longlat")
   centroids <- st_centroid(grid_lonlat)

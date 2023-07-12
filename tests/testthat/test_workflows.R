@@ -1,5 +1,6 @@
 context("test workflow functions")
 library(raster)
+library(dplyr)
 
 test_that("Test intersection fraction computation", {
   
@@ -28,7 +29,7 @@ test_that("Test zone fractions computation", {
     mutate(zone_frac=sum(as.double(zone_frac)),cell_frac=sum(as.double(zone_frac))) %>% 
     ungroup() %>% 
     dplyr::select(GEOID,zone_frac) %>% 
-    distinct()->grouped_output
+    dplyr::distinct()->grouped_output
   
   tmp <- grouped_output %>% filter(zone_frac < 0.96)
   
