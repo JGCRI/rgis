@@ -1,3 +1,5 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
     branches: [main, master]
@@ -5,9 +7,6 @@ on:
     branches: [main, master]
 
 name: test-coverage
-- name: Upload coverage reports to Codecov
-  uses: codecov/codecov-action@v3
-   env: CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 jobs:
   test-coverage:
