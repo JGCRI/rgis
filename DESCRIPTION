@@ -1,4 +1,4 @@
-Package: rgisworkflows
+Package: rgis
 Type: Package
 Title: R-based Geographic Information System (GIS) utilities
 Version: 0.0.1
