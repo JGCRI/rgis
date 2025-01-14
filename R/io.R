@@ -7,16 +7,15 @@
 #'
 #' @param shp_path character. A full path to the input shapefile with file name and extension
 #' @param quiet boolean.
-#' @param method tool used to convert to spatial data; either 'sf' or 'rgdal'
+#' @param method tool used to convert to spatial data; i.e. 'sf'
 #' @return sf object
 #' @author Chris R. Vernon (chris.vernon@pnnl.gov)
 #' @importFrom sf st_read
-#' @importFrom rgdal readOGR
 #' @export
 import_shapefile <- function(shp_path, quiet = TRUE, method = "sf") {
   
   if(method == "sf") return(st_read(shp_path, quiet = quiet))
-  if(method == "rgdal") return(readOGR(shp_path, verbose = !quiet))
+  
 }
 
 

@@ -1,4 +1,4 @@
-Package: rgis
+Package: rgisworkflows
 Type: Package
 Title: R-based Geographic Information System (GIS) utilities
 Version: 0.0.1
@@ -7,6 +7,9 @@ Authors@R: c(person("Chris", "Vernon",
             role = c("cre", "aut")),
             person("Caleb", "Braun",
             email = "caleb.braun@pnnl.gov",
+            role = "aut"),
+            person("Kanishka B.", "Narayan",
+            email = "kanishka.narayan@pnnl.gov",
             role = "aut"),
             person("Pacific Northwest National Laboratory",
             role = "cph"))
@@ -25,7 +28,6 @@ Imports:
     doParallel,
     foreach,
     magrittr,
-    rgdal,
     smoothr,
     tibble,
     units,
