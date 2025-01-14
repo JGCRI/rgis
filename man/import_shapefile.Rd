@@ -11,7 +11,7 @@ import_shapefile(shp_path, quiet = TRUE, method = "sf")
 
 \item{quiet}{boolean.}
 
-\item{method}{tool used to convert to spatial data; either 'sf' or 'rgdal'}
+\item{method}{tool used to convert to spatial data; i.e. 'sf'}
 }
 \value{
 sf object
