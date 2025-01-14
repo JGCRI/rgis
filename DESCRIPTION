@@ -8,6 +8,9 @@ Authors@R: c(person("Chris", "Vernon",
             person("Caleb", "Braun",
             email = "caleb.braun@pnnl.gov",
             role = "aut"),
+            person("Kanishka B.", "Narayan",
+            email = "kanishka.narayan@pnnl.gov",
+            role = "aut"),
             person("Pacific Northwest National Laboratory",
             role = "cph"))
 Description: The rgis package facilitates GIS functionality and workflows commonly reprented in propritary and open source GISs. This package does not contain functionality for visulization, but is focsed on geospatial algorithms for analysis, conversion, IO, modification, and workflows of spatial files and data structures.
@@ -25,7 +28,6 @@ Imports:
     doParallel,
     foreach,
     magrittr,
-    rgdal,
     smoothr,
     tibble,
     units,
